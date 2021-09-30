@@ -1,4 +1,7 @@
-﻿namespace TrackMapGenerator.Parameters
+﻿using System.Linq;
+using TrackMapGenerator.Map;
+
+namespace TrackMapGenerator.Parameters
 {
     public static class ParameterList
     {
@@ -33,6 +36,21 @@
             "Enabled if the longitudes are to the south of the equator."
         );
         
+        public static readonly StringParameter Generator = new StringParameter(
+            Generators.DefaultGenerator,
+            "generator",
+            new [] { "g" },
+            "The generator to use.",
+            Generators.GeneratorList.Keys.ToArray()
+        );
+        
+        public static readonly StringParameter GeneratorOptions = new StringParameter(
+            "",
+            "generator-options",
+            new [] { "go" },
+            "Options to be passed to the map generator."
+        );
+        
         public static readonly IntegerParameter Resolution = new IntegerParameter(
             2700,
             "resolution",
@@ -44,12 +62,12 @@
             null,
             "background",
             new[] { "bg", "back" },
-            "The background map to use. The top left corner must represent 90 N, 180 E and the bottom right corner must represent 90 S, 180 W. The map must also follow the Mercator projection for maximum compatibility.",
+            "The background map file to use. This will depend on the used projection.",
             true
         );
         
         public static readonly FileParameter Output = new FileParameter(
-            null,
+            "track.png",
             "output",
             new[] { "o" },
             "The output file where the track will be saved.",
@@ -57,7 +75,9 @@
         );
         
         public static readonly Parameter[] Parameters = {
-            Input, Format, NegativeX, NegativeY, Resolution, Background, Output
+            Input, Format, NegativeX, NegativeY, 
+            Generator, GeneratorOptions,
+            Resolution, Background, Output
         };
         
     }

@@ -33,7 +33,7 @@ namespace TrackMapGenerator.Parameters
         /// <summary>
         /// A combined list of this parameter's identifiers (e.g. `--input`, `-i`)
         /// </summary>
-        protected readonly List<string> Identifiers;
+        public readonly List<string> Identifiers;
         
         /// <summary>
         /// Creates a new Parameter declaration, used to scan for values in process arguments.
@@ -125,8 +125,8 @@ namespace TrackMapGenerator.Parameters
             if (args.Length == 0)
                 throw new ArgumentException($"Expecting at least 1 value for {identifier}, got 0");
             string value = string.Join(' ', args);
-            if (allowedValues != null && allowedValues.Contains(value))
-                throw new ArgumentException($"Unexpected value for {identifier} + \"{value}\"");
+            if (allowedValues != null && !allowedValues.Contains(value))
+                throw new ArgumentException($"Unexpected value for {identifier}: \"{value}\"");
             return args[0];
         }
     }
