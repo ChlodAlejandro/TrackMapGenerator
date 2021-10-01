@@ -25,6 +25,14 @@ namespace TrackMapGenerator.Formats
         }
     }
 
+    public enum StormType
+    {
+        TropicalCyclone,
+        SubtropicalCyclone,
+        ExtratropicalCyclone,
+        Low
+    }
+
     public struct StormDataPoint
     {
         public DateTime Time;
@@ -32,5 +40,6 @@ namespace TrackMapGenerator.Formats
         public double Longitude;
         public double Winds;
         public double Pressure;
+        public StormType Type;
     }
 }

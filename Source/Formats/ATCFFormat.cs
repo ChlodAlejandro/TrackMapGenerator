@@ -39,7 +39,26 @@ namespace TrackMapGenerator.Formats
                     Longitude = double.Parse(columns[7][..^1]) / 10 * 
                                 (columns[7].Last() == 'E' ? 1 : -1),
                     Winds = double.Parse(columns[8]),
-                    Pressure = double.Parse(columns[9])
+                    Pressure = double.Parse(columns[9]),
+                    Type = columns[10] switch {
+                         var x when
+                             x == "TD" ||
+                             x == "TS" ||
+                             x == "ST" ||
+                             x == "TC" ||
+                             x == "HU" ||
+                             x == "TY" => StormType.TropicalCyclone,
+                         var x when
+                             x == "SD" ||
+                             x == "SS" => StormType.SubtropicalCyclone,
+                         "EX" => StormType.ExtratropicalCyclone,
+                         var x when
+                             x == "DB" ||
+                             x == "LO" ||
+                             x == "WV" ||
+                             x == "MD" => StormType.Low,
+                         _ => dataPoints.Last().Type
+                    }
                 });
             }
 

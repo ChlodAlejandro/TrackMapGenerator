@@ -7,7 +7,8 @@ namespace TrackMapGenerator.Parameters
 {
     public static class Options
     {
-        public static readonly List<StormData> Storms = new List<StormData>();
+        public static readonly StormList Storms = new StormList();
+        public static string Scale = ParameterList.Scale.Default;
         public static string Generator = ParameterList.Generator.Default;
         public static string GeneratorOptions = ParameterList.GeneratorOptions.Default;
         public static int Resolution = ParameterList.Resolution.Default;
@@ -26,6 +27,11 @@ namespace TrackMapGenerator.Parameters
             {
                 switch (parameter.Name)
                 {
+                    case "scale":
+                    {
+                        Scale = parameter.GetValue(identifier, args);
+                        break;
+                    }
                     case "generator":
                     {
                         Generator = parameter.GetValue(identifier, args);
@@ -126,6 +132,7 @@ namespace TrackMapGenerator.Parameters
             {
                 StormDataFormatter.Formatters[storm.Format]().Read(storm, storm.Data);
             }
+            Storms.UpdateBounds();
         }
     }
 }

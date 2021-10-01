@@ -1,4 +1,6 @@
-﻿namespace TrackMapGenerator.Map
+﻿using System;
+
+namespace TrackMapGenerator.Map
 {
     public readonly struct Coordinate
     {
@@ -15,6 +17,12 @@
         {
             Latitude = latitude;
             Longitude = longitude;
+        }
+
+        public override string ToString()
+        {
+            return
+                $"{Math.Abs(Latitude)}{(Latitude < 0 ? "S" : "N")}, {Math.Abs(Longitude)}{(Longitude < 0 ? "W" : "E")}";
         }
     }
     

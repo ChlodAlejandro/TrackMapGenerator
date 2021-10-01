@@ -65,6 +65,7 @@ namespace TrackMapGenerator
                     Console.Error.WriteLine(e.StackTrace);
                     return 1;
                 }
+                Console.WriteLine("Done.");
                 return 0;
             }
 

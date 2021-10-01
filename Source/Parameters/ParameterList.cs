@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using TrackMapGenerator.Map;
+using TrackMapGenerator.Scales;
 
 namespace TrackMapGenerator.Parameters
 {
@@ -34,6 +35,14 @@ namespace TrackMapGenerator.Parameters
             "negative-y",
             new [] { "negy", "ny" },
             "Enabled if the longitudes are to the south of the equator."
+        );
+
+        public static readonly StringParameter Scale = new StringParameter(
+            IntensityScale.DefaultScale,
+            "scale",
+            new[] { "s" },
+            "The storm intensity scale to use.",
+            IntensityScale.Scales.Keys.ToArray()
         );
         
         public static readonly StringParameter Generator = new StringParameter(
