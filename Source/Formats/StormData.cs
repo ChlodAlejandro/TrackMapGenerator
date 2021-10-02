@@ -11,7 +11,7 @@ namespace TrackMapGenerator.Formats
     public class StormData
     {
         public readonly string Data;
-        public StormDataFormat Format;
+        public string Format;
         public StormDataAttributes Attributes;
         public readonly Dictionary<string, dynamic> MiscellaneousData =
             new Dictionary<string, dynamic>();
@@ -19,7 +19,7 @@ namespace TrackMapGenerator.Formats
 
         public StormData(
             string data, 
-            StormDataFormat format, 
+            string format, 
             StormDataAttributes attributes = 0
         )
         {

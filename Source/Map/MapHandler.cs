@@ -20,7 +20,7 @@ namespace TrackMapGenerator.Map
         /// </summary>
         public static readonly Dictionary<string, string> MapUrl = new Dictionary<string, string>
         {
-            { "mercator", "https://upload.wikimedia.org/wikipedia/commons/4/4d/Whole_world_-_land_and_oceans.jpg" }
+            { "mercator", "https://upload.wikimedia.org/wikipedia/commons/8/8f/Whole_world_-_land_and_oceans_12000.jpg" }
         };
 
         public static readonly string UserAgent =

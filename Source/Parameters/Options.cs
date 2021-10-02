@@ -72,7 +72,7 @@ namespace TrackMapGenerator.Parameters
             int formatChanges = 0;
             bool inputAfterFormat = false;
             StormDataAttributes defaultAttributes = 0;
-            StormDataFormat currentFormat = StormDataFormat.HURDAT;
+            string currentFormat = StormDataFormat.DefaultFormat;
             StormData lastStorm = null;
             foreach ((dynamic parameter, string identifier, string[] args) in parameters)
             {
@@ -95,15 +95,7 @@ namespace TrackMapGenerator.Parameters
                     }
                     case "format":
                     {
-                        currentFormat = parameter.GetValue(identifier, args) switch
-                        {
-                            "hurdat" => StormDataFormat.HURDAT,
-                            "atcf" => StormDataFormat.ATCF,
-                            "tcr" => StormDataFormat.TCR,
-                            "md" => StormDataFormat.MD,
-                            "tab" => StormDataFormat.TAB,
-                            _ => currentFormat
-                        };
+                        currentFormat = parameter.GetValue(identifier, args);
                         formatChanges++;
                         inputAfterFormat = false;
                         break;
@@ -136,7 +128,7 @@ namespace TrackMapGenerator.Parameters
 
             foreach (StormData storm in Storms)
             {
-                StormDataFormatter.Formatters[storm.Format]().Read(storm, storm.Data);
+                StormDataFormat.Formats[storm.Format].Read(storm, storm.Data);
             }
             Storms.UpdateBounds();
         }

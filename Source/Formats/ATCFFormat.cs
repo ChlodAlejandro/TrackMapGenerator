@@ -10,7 +10,7 @@ using System.Linq;
 namespace TrackMapGenerator.Formats
 {
     // ReSharper disable once InconsistentNaming
-    public class ATCFFormat : StormDataFormatter
+    public class ATCFFormat : StormDataFormat
     {
         public override void Read(StormData storm, Stream data)
         {

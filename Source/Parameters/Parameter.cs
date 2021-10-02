@@ -109,7 +109,7 @@ namespace TrackMapGenerator.Parameters
 
     public class StringParameter : TypedParameter<string>
     {
-        private readonly string[] allowedValues;
+        public readonly string[] AllowedValues;
 
         /// <inheritdoc />
         /// <param name="allowedValues">The allowed values for this parameter.</param>
@@ -121,7 +121,7 @@ namespace TrackMapGenerator.Parameters
             string[] allowedValues = null
         ) : base(@default, name, aliases, description)
         {
-            this.allowedValues = allowedValues;
+            AllowedValues = allowedValues;
         }
 
         public override string GetValue(string identifier, string[] args)
@@ -129,7 +129,7 @@ namespace TrackMapGenerator.Parameters
             if (args.Length == 0)
                 throw new ArgumentException($"Expecting at least 1 value for {identifier}, got 0");
             string value = string.Join(' ', args);
-            if (allowedValues != null && !allowedValues.Contains(value))
+            if (AllowedValues != null && !AllowedValues.Contains(value))
                 throw new ArgumentException($"Unexpected value for {identifier}: \"{value}\"");
             return args[0];
         }

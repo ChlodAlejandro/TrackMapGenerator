@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -228,16 +229,20 @@ namespace TrackMapGenerator.Map
                 );
                 
                 Console.WriteLine(":: Cropping background...");
-                ResizeOptions resizeOptions = new ResizeOptions
+                context.Resize(new ResizeOptions
                 {
                     CenterCoordinates = new PointF(0, 0),
                     Size = new Size(
                         (int) Math.Round(bgWidthRatio * width),
                         (int) Math.Round(bgHeightRatio * height)
                     )
-                };
-                context.Resize(resizeOptions);
-                context.Crop(width, height);
+                });
+                context.Resize(new ResizeOptions
+                {
+                    CenterCoordinates = new PointF(0, 0),
+                    Mode = ResizeMode.Crop,
+                    Size = new Size(width, height)
+                });
                 
                 Console.WriteLine(":: Drawing overlay...");
                 context.DrawImage(
@@ -259,11 +264,18 @@ namespace TrackMapGenerator.Map
             IntensityScale scale = IntensityScale.Scales[Options.Scale];
             (PixelLocation cropPoint, int cropWidth, int cropHeight) = cropDimensions;
 
+            cropWidth = cropWidth > width ? width : cropWidth;
+            cropHeight = cropHeight > height ? height : cropHeight;
+
             int cropX = (int) Math.Round(cropPoint.X);
             int cropY = (int) Math.Round(cropPoint.Y);
 
-            int dotSize = int.Parse(generatorOptions["dot"] ?? "9") * (width / cropWidth);
-            int lineSize = int.Parse(generatorOptions["line"] ?? "3") * (width / cropWidth);
+            int dotSize = (int)(generatorOptions["dot"] != null
+                ? int.Parse(generatorOptions["dot"])
+                : Math.Round(Math.Max(width, height) * 0.007));
+            int lineSize = (int)(generatorOptions["line"] != null
+                ? int.Parse(generatorOptions["line"])
+                : Math.Round(Math.Max(width, height) * 0.0025));
             
             overlay.Mutate(context =>
             {
@@ -303,6 +315,13 @@ namespace TrackMapGenerator.Map
                     PixelLocation center = CoordinateToPixels(
                         new Coordinate(point.Latitude, point.Longitude),
                         bgWidth, bgHeight
+                    );
+                    context.Fill(
+                        scale.GetColor(point),
+                        scale.GetShape(point, new PixelLocation(
+                            MathD.Remap(0, cropWidth, 0, width, center.X - cropX),
+                            MathD.Remap(0, cropHeight, 0, height, center.Y - cropY)
+                        ), dotSize)
                     );
                     context.Fill(
                         scale.GetColor(point),

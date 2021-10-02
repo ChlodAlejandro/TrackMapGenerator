@@ -163,6 +163,13 @@ namespace TrackMapGenerator
                     choppedDescription = "        ";
                 }
                 if (choppedDescription.Length > 8) Console.WriteLine(choppedDescription);
+
+                if (parameter is StringParameter && parameter.AllowedValues != null)
+                {
+                    Console.WriteLine(
+                        "        Allowed values: [" + string.Join(", ", parameter.AllowedValues) + "]"
+                    );
+                }
                 
                 Console.WriteLine();
             }

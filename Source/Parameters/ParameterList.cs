@@ -1,6 +1,7 @@
 ﻿#region
 
 using System.Linq;
+using TrackMapGenerator.Formats;
 using TrackMapGenerator.Map;
 using TrackMapGenerator.Scales;
 
@@ -20,11 +21,11 @@ namespace TrackMapGenerator.Parameters
         );
 
         public static readonly StringParameter Format = new StringParameter(
-            "hurdat",
+            StormDataFormat.DefaultFormat,
             "format",
             new[] { "f" },
             "The format of the succeeding input files. If this is placed after all --inputs, this will set the format of all previous input files.",
-            new [] { "hurdat", "atcf", "tcr", "md", "tab" }
+            StormDataFormat.Formats.Keys.ToArray()
         );
 
         public static readonly BooleanParameter NegativeX = new BooleanParameter(

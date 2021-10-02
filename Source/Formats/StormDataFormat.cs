@@ -10,12 +10,13 @@ using TrackMapGenerator.Parameters;
 
 namespace TrackMapGenerator.Formats
 {
-    public abstract class StormDataFormatter
+    public abstract class StormDataFormat
     {
-        public static Dictionary<StormDataFormat, Func<StormDataFormatter>> Formatters =
-            new Dictionary<StormDataFormat, Func<StormDataFormatter>>
+        public static readonly string DefaultFormat = "atcf"; 
+        public static readonly Dictionary<string, StormDataFormat> Formats =
+            new Dictionary<string, StormDataFormat>
             {
-                { StormDataFormat.ATCF, () => new ATCFFormat() }
+                { "atcf", new ATCFFormat() },
             };
 
         public void Read(StormData storm, string data)
