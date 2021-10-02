@@ -3,6 +3,8 @@ Create tropical cyclone track maps.
 
 It is inspired by titoxd's [wptc-track](https://github.com/titoxd/wptc-track), written in C# and based on .NET core for cross-platform compatibility. It is ***not*** backwards-compatible with wptc-track as it uses a renewed arguments system built from the ground up, inspired by FFmpeg.
 
+If you're not used to a command line interface, a much more user-friendly generator is available [here](https://trackgen.codingcactus.repl.co/).
+
 ## Differences with wptc-track
 * Written in C# and uses .NET core, which allows it to run on Linux, macOS, and Windows (even without WSL or Cygwin), as long as the [.NET Core 3.1 Runtime](https://dotnet.microsoft.com/download/dotnet/3.1/runtime) has been installed.
     * .NET is open-source and released under the [MIT license](https://github.com/dotnet/runtime/blob/main/LICENSE.TXT).

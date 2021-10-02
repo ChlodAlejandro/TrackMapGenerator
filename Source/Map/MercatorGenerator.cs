@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -201,18 +202,21 @@ namespace TrackMapGenerator.Map
             // Load the background
             Image background = Image.Load(MapHandler.MapLocation);
             
-            // Generate the overlay (dots, lines, etc.)
-            Image overlay = DrawOverlay(background.Width, background.Height);
-            
-            // TODO: Move this operation to the target to avoid the shapes from being scaled.
-            background.Mutate(context =>
-            {
-                context.DrawImage(overlay, new GraphicsOptions());
-            });
-
-            // Crop the background to the portion we want.
-            (PixelLocation cropPoint, int cropWidth, int cropHeight) = 
+            // Get the background scale
+            Tuple<PixelLocation, int, int> cropDimensions = 
                 FindCropDimensions(focus, background.Width, background.Height);
+            (PixelLocation cropPoint, int cropWidth, int cropHeight) = cropDimensions;
+            double bgWidthRatio = (double) width / cropWidth;
+            double bgHeightRatio = (double) height / cropHeight;
+            
+            // Generate the overlay (dots, lines, etc.)
+            Image overlay = DrawOverlay(
+                cropDimensions,
+                background.Width, background.Height, 
+                width, height
+            );
+
+            // Crop the background to the portion we want and then overlay.
             target.Mutate(context =>
             {
                 context.DrawImage(
@@ -227,12 +231,16 @@ namespace TrackMapGenerator.Map
                 {
                     CenterCoordinates = new PointF(0, 0),
                     Size = new Size(
-                        (int) Math.Round((double) width / cropWidth * width),
-                        (int) Math.Round((double) height / cropHeight * height)
+                        (int) Math.Round(bgWidthRatio * width),
+                        (int) Math.Round(bgHeightRatio * height)
                     )
                 };
                 context.Resize(resizeOptions);
                 context.Crop(width, height);
+                context.DrawImage(
+                    overlay,
+                    new GraphicsOptions()
+                );
             });
             
             // Write image to file.
@@ -244,10 +252,25 @@ namespace TrackMapGenerator.Map
             target.Dispose();
         }
 
-        private Image DrawOverlay(int width, int height)
+        private Image DrawOverlay(
+            Tuple<PixelLocation, int, int> cropDimensions, int bgWidth, int bgHeight, int width, int height
+        )
         {
             Image overlay = new Image<Rgba32>(width, height, Color.Transparent);
             IntensityScale scale = IntensityScale.Scales[Options.Scale];
+            (PixelLocation cropPoint, int cropWidth, int cropHeight) = cropDimensions;
+
+            // int cropX = (int) Math.Round(
+            //     MathD.Remap(0, bgWidth, 0, (double) width / bgWidth * width, cropPoint.X)
+            // );
+            // int cropY = (int) Math.Round(
+            //     MathD.Remap(0, bgHeight, 0, (double) height / bgHeight * height, cropPoint.Y)
+            // );
+            int cropX = (int) Math.Round(cropPoint.X);
+            int cropY = (int) Math.Round(cropPoint.Y);
+
+            int dotSize = int.Parse(generatorOptions["dot"] ?? "9") * (width / cropWidth);
+            int lineSize = int.Parse(generatorOptions["line"] ?? "2") * (width / cropWidth);
             
             overlay.Mutate(context =>
             {
@@ -255,28 +278,45 @@ namespace TrackMapGenerator.Map
                 {
                     PixelLocation centerA = CoordinateToPixels(
                         new Coordinate(pointA.Latitude, pointA.Longitude),
-                        width, height
+                        bgWidth, bgHeight
                     );
                     PixelLocation centerB = CoordinateToPixels(
                         new Coordinate(pointB.Latitude, pointB.Longitude),
-                        width, height
+                        bgWidth, bgHeight
                     );
                     context.DrawLines(
                         Color.White,
-                        3,
-                        new PointF((int) centerA.X, (int) centerA.Y),
-                        new PointF((int) centerB.X, (int) centerB.Y)
+                        lineSize,
+                        new PointF(
+                            (int) Math.Round(
+                                MathD.Remap(0, cropWidth, 0, width, centerA.X - cropX)
+                            ),
+                            (int) Math.Round(
+                                MathD.Remap(0, cropHeight, 0, height, centerA.Y - cropY)
+                            )
+                        ),
+                        new PointF(
+                            (int) Math.Round(
+                                MathD.Remap(0, cropWidth, 0, width, centerB.X - cropX)
+                            ),
+                            (int) Math.Round(
+                                MathD.Remap(0, cropHeight, 0, height, centerB.Y - cropY)
+                            )
+                        )
                     );
                 });
                 Options.Storms.IteratePoints((_, point) =>
                 {
                     PixelLocation center = CoordinateToPixels(
                         new Coordinate(point.Latitude, point.Longitude),
-                        width, height
+                        bgWidth, bgHeight
                     );
                     context.Fill(
                         scale.GetColor(point),
-                        scale.GetShape(point, center, 8)
+                        scale.GetShape(point, new PixelLocation(
+                            MathD.Remap(0, cropWidth, 0, width, center.X - cropX),
+                            MathD.Remap(0, cropHeight, 0, height, center.Y - cropY)
+                        ), dotSize)
                     );
                 });
             });
