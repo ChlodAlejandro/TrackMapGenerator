@@ -1,7 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region
+
+using System;
 using System.IO;
 using TrackMapGenerator.Formats;
+using TrackMapGenerator.Map;
+
+#endregion
 
 namespace TrackMapGenerator.Parameters
 {
@@ -19,6 +23,8 @@ namespace TrackMapGenerator.Parameters
         {
             ReadOrderedParameters(parameters);
             ReadUnorderedParameters(parameters);
+
+            Background ??= MapHandler.MapLocation;
         }
 
         internal static void ReadUnorderedParameters(Tuple<Parameter, string, string[]>[] parameters)

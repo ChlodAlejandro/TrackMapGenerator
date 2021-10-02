@@ -1,5 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
+using SixLabors.ImageSharp;
+
+#endregion
 
 namespace TrackMapGenerator.Map
 {
@@ -18,6 +23,6 @@ namespace TrackMapGenerator.Map
     {
         protected Generator(string generatorOptions) {}
 
-        public abstract void Draw();
+        public abstract Image Draw();
     }
 }

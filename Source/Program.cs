@@ -1,12 +1,17 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using SixLabors.ImageSharp;
 using TrackMapGenerator.Map;
 using TrackMapGenerator.Parameters;
+
+#endregion
 
 namespace TrackMapGenerator
 {
@@ -51,7 +56,26 @@ namespace TrackMapGenerator
                 }
                 try
                 {
-                    Generators.GeneratorList[Options.Generator](Options.GeneratorOptions).Draw();
+                    if (!File.Exists(Options.Background))
+                    {
+                        Console.WriteLine("Cannot find background. Will download.");
+                        MapHandler.Download().Wait();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine($"Could not download track map: {e.Message}");
+                    Console.Error.WriteLine(e.StackTrace);
+                    return 3;
+                }
+                try
+                {
+                    Console.WriteLine("Generating track map...");
+                    Image target = 
+                        Generators.GeneratorList[Options.Generator](Options.GeneratorOptions).Draw();
+                    Console.WriteLine("Saving...");
+                    target.Save(Options.Output);
+                    target.Dispose();
                 }
                 catch (Exception e)
                 {

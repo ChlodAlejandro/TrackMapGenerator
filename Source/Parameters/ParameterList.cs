@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿#region
+
+using System.Linq;
 using TrackMapGenerator.Map;
 using TrackMapGenerator.Scales;
+
+#endregion
 
 namespace TrackMapGenerator.Parameters
 {

@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿#region
+
+using System.Collections.Generic;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.PixelFormats;
 using TrackMapGenerator.Formats;
 using TrackMapGenerator.Map;
+
+#endregion
 
 namespace TrackMapGenerator.Scales
 {

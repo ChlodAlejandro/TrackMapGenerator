@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+#endregion
 
 #pragma warning disable 1573
 namespace TrackMapGenerator.Parameters

@@ -1,5 +1,9 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Diagnostics.CodeAnalysis;
+
+#endregion
 
 namespace TrackMapGenerator.Parameters
 {

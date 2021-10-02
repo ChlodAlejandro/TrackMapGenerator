@@ -1,17 +1,18 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Numerics;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using TrackMapGenerator.Formats;
 using TrackMapGenerator.Parameters;
 using TrackMapGenerator.Scales;
 using TrackMapGenerator.Util;
+
+#endregion
 
 namespace TrackMapGenerator.Map
 {
@@ -187,20 +188,17 @@ namespace TrackMapGenerator.Map
 
         // Mutations are not asynchronous.
         [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-        public override void Draw()
+        public override Image Draw()
         {
-            if (!File.Exists(MapHandler.MapLocation))
-                MapHandler.Download().Wait();
-
             Tuple<Coordinate, Coordinate> focus = FindFocus();
             (int width, int height) = FindDimensions(focus);
-            Console.WriteLine(width + ":" + height);
             
             // Create the target image.
             Image target = new Image<Rgba32>(width, height);
-
-            // Load the background
-            Image background = Image.Load(MapHandler.MapLocation);
+            
+            Console.WriteLine(":: Loading background...");
+            // Load the background; should exist no matter what
+            Image background = Image.Load(Options.Background);
             
             // Get the background scale
             Tuple<PixelLocation, int, int> cropDimensions = 
@@ -209,16 +207,17 @@ namespace TrackMapGenerator.Map
             double bgWidthRatio = (double) width / cropWidth;
             double bgHeightRatio = (double) height / cropHeight;
             
+            Console.WriteLine(":: Generating overlay...");
             // Generate the overlay (dots, lines, etc.)
             Image overlay = DrawOverlay(
                 cropDimensions,
                 background.Width, background.Height, 
                 width, height
             );
-
-            // Crop the background to the portion we want and then overlay.
+            
             target.Mutate(context =>
             {
+                Console.WriteLine(":: Drawing background...");
                 context.DrawImage(
                     background,
                     new Point(
@@ -227,6 +226,8 @@ namespace TrackMapGenerator.Map
                     ),
                     new GraphicsOptions()
                 );
+                
+                Console.WriteLine(":: Cropping background...");
                 ResizeOptions resizeOptions = new ResizeOptions
                 {
                     CenterCoordinates = new PointF(0, 0),
@@ -237,19 +238,17 @@ namespace TrackMapGenerator.Map
                 };
                 context.Resize(resizeOptions);
                 context.Crop(width, height);
+                
+                Console.WriteLine(":: Drawing overlay...");
                 context.DrawImage(
                     overlay,
                     new GraphicsOptions()
                 );
             });
             
-            // Write image to file.
-            target.Save(Options.Output);
-            
-            // Dispose.
             background.Dispose();
             overlay.Dispose();
-            target.Dispose();
+            return target;
         }
 
         private Image DrawOverlay(
@@ -260,17 +259,11 @@ namespace TrackMapGenerator.Map
             IntensityScale scale = IntensityScale.Scales[Options.Scale];
             (PixelLocation cropPoint, int cropWidth, int cropHeight) = cropDimensions;
 
-            // int cropX = (int) Math.Round(
-            //     MathD.Remap(0, bgWidth, 0, (double) width / bgWidth * width, cropPoint.X)
-            // );
-            // int cropY = (int) Math.Round(
-            //     MathD.Remap(0, bgHeight, 0, (double) height / bgHeight * height, cropPoint.Y)
-            // );
             int cropX = (int) Math.Round(cropPoint.X);
             int cropY = (int) Math.Round(cropPoint.Y);
 
             int dotSize = int.Parse(generatorOptions["dot"] ?? "9") * (width / cropWidth);
-            int lineSize = int.Parse(generatorOptions["line"] ?? "2") * (width / cropWidth);
+            int lineSize = int.Parse(generatorOptions["line"] ?? "3") * (width / cropWidth);
             
             overlay.Mutate(context =>
             {

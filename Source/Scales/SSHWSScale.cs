@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.PixelFormats;
 using TrackMapGenerator.Formats;
 using TrackMapGenerator.Map;
+
+#endregion
 
 namespace TrackMapGenerator.Scales
 {
@@ -27,13 +31,21 @@ namespace TrackMapGenerator.Scales
             return point.Type switch
             {
                 StormType.TropicalCyclone =>
-                    new EllipsePolygon((float) center.X, (float) center.Y, size),
+                    new EllipsePolygon(
+                        (float) center.X, (float) center.Y, size
+                    ),
                 StormType.SubtropicalCyclone =>
-                    new RectangularPolygon((float) center.X, (float) center.Y, size, size),
+                    new RectangularPolygon(
+                        (float) center.X, (float) center.Y, size, size
+                    ),
                 StormType.ExtratropicalCyclone =>
-                    new RegularPolygon((float) center.X, (float) center.Y, 3, size, (float) Math.PI),
+                    new RegularPolygon(
+                        (float) center.X, (float) center.Y, 3, (int)(size * 1.2), (float) Math.PI
+                    ),
                 StormType.Low =>
-                    new RegularPolygon((float) center.X, (float) center.Y, 3, size, (float) Math.PI),
+                    new RegularPolygon(
+                        (float) center.X, (float) center.Y, 3, (int)(size * 1.2), (float) Math.PI
+                    ),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
